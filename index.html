@@ -25,9 +25,9 @@
     --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
     --serif: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
   }
-
+ 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
+ 
   html, body {
     margin: 0;
     padding: 0;
@@ -35,22 +35,24 @@
     background: var(--void);
     overscroll-behavior: none;
   }
-
+ 
   body {
     font-family: var(--mono);
     color: var(--ghost);
   }
-
+ 
   #feed {
     height: 100vh;
     height: 100dvh;
     overflow-y: scroll;
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
-
-  #feed::-webkit-scrollbar { display: none; }
-
+ 
+  #feed::-webkit-scrollbar { display: none; width: 0; height: 0; }
+ 
   .screen {
     height: 100vh;
     height: 100dvh;
@@ -65,7 +67,7 @@
     flex-shrink: 0;
     overflow: hidden;
   }
-
+ 
   .void-dot {
     width: 4px;
     height: 4px;
@@ -73,12 +75,12 @@
     background: var(--ghost-dim);
     animation: breathe 4.5s ease-in-out infinite;
   }
-
+ 
   @keyframes breathe {
     0%, 100% { opacity: 0.25; transform: scale(1); }
     50% { opacity: 0.6; transform: scale(1.8); }
   }
-
+ 
   #chrome {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -94,14 +96,14 @@
     z-index: 10;
     background: linear-gradient(to bottom, rgba(10,10,11,0.9), transparent);
   }
-
+ 
   #counter {
     font-variant-numeric: tabular-nums;
     transition: color 0.4s ease;
   }
-
+ 
   #counter.pulse { color: var(--amber); }
-
+ 
   #future-hook {
     position: fixed;
     bottom: 22px;
@@ -117,9 +119,9 @@
     font-family: var(--mono);
     padding: 0;
   }
-
+ 
   #future-hook:hover { color: var(--ghost); }
-
+ 
   #modal-backdrop {
     position: fixed;
     inset: 0;
@@ -129,9 +131,9 @@
     justify-content: center;
     z-index: 30;
   }
-
+ 
   #modal-backdrop.show { display: flex; }
-
+ 
   #modal {
     background: var(--void-soft);
     border: 1px solid var(--line);
@@ -140,7 +142,7 @@
     max-width: 320px;
     text-align: center;
   }
-
+ 
   #modal h2 {
     font-family: var(--serif);
     font-weight: normal;
@@ -149,14 +151,14 @@
     color: var(--paper);
     margin: 0 0 10px;
   }
-
+ 
   #modal p {
     font-size: 12px;
     line-height: 1.6;
     color: var(--ghost);
     margin: 0 0 18px;
   }
-
+ 
   #modal button {
     font-family: var(--mono);
     font-size: 11px;
@@ -169,9 +171,9 @@
     border-radius: 5px;
     cursor: pointer;
   }
-
+ 
   /* ---- per-screen reel chrome ---- */
-
+ 
   .burst-heart {
     position: absolute;
     width: 92px;
@@ -181,7 +183,7 @@
     z-index: 8;
     animation: burst 0.75s ease forwards;
   }
-
+ 
   .burst-heart svg {
     width: 100%;
     height: 100%;
@@ -189,7 +191,7 @@
     stroke: none;
     filter: drop-shadow(0 2px 14px rgba(0,0,0,0.45));
   }
-
+ 
   @keyframes burst {
     0%   { opacity: 0;   transform: translate(-50%, -50%) scale(0.3); }
     15%  { opacity: 1;   transform: translate(-50%, -50%) scale(1.15); }
@@ -197,7 +199,7 @@
     45%  { opacity: 1;   transform: translate(-50%, -50%) scale(1.05); }
     100% { opacity: 0;   transform: translate(-50%, -50%) scale(1); }
   }
-
+ 
   .icon-rail {
     position: absolute;
     right: 12px;
@@ -208,7 +210,7 @@
     gap: 22px;
     z-index: 5;
   }
-
+ 
   .icon-btn {
     background: none;
     border: none;
@@ -222,9 +224,9 @@
     font-family: var(--mono);
     transition: transform 0.15s ease;
   }
-
+ 
   .icon-btn:active { transform: scale(0.82); }
-
+ 
   .icon-btn svg {
     width: 27px;
     height: 27px;
@@ -232,17 +234,17 @@
     fill: none;
     stroke-width: 1.7;
   }
-
+ 
   .icon-btn.liked svg {
     stroke: #ff4d67;
     fill: #ff4d67;
   }
-
+ 
   .icon-btn .count {
     font-size: 10px;
     color: rgba(255,255,255,0.5);
   }
-
+ 
   .avatar-ring {
     width: 30px;
     height: 30px;
@@ -251,7 +253,7 @@
     border: 1px solid rgba(255,255,255,0.15);
     margin-bottom: 4px;
   }
-
+ 
   .caption-block {
     position: absolute;
     left: 16px;
@@ -259,7 +261,7 @@
     bottom: 30px;
     z-index: 5;
   }
-
+ 
   .skel-line {
     height: 11px;
     border-radius: 4px;
@@ -273,28 +275,28 @@
     background-size: 400% 100%;
     animation: shimmer 2.2s ease-in-out infinite;
   }
-
+ 
   @keyframes shimmer {
     0% { background-position: 100% 0; }
     100% { background-position: -100% 0; }
   }
-
+ 
   .skel-username {
     width: 96px;
     height: 12px;
     margin-bottom: 10px;
   }
-
+ 
   .skel-caption-1 { width: 78%; }
   .skel-caption-2 { width: 52%; margin-bottom: 0; }
-
+ 
   .username-row {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 10px;
   }
-
+ 
   .page-badge {
     position: absolute;
     top: 18px;
@@ -309,16 +311,16 @@
 </style>
 </head>
 <body>
-
+ 
 <div id="chrome">
   <span>void</span>
   <span id="counter">0 screens</span>
 </div>
-
+ 
 <div id="feed"></div>
-
+ 
 <button id="future-hook">+ add your own content (coming soon)</button>
-
+ 
 <div id="modal-backdrop">
   <div id="modal">
     <h2>Not yet — but soon</h2>
@@ -326,39 +328,39 @@
     <button id="modal-close">Got it</button>
   </div>
 </div>
-
+ 
 <script>
   const feed = document.getElementById('feed');
   const counterEl = document.getElementById('counter');
-
+ 
   let screenCount = 0;
   let scrollsCounted = 0;
-
+ 
   const HEART = '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
   const HEART_FILLED = '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
   const COMMENT = '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4 8.7 8.7 0 0 1-3.8-.9L3 20l1.1-5a8.3 8.3 0 0 1-1-4A8.4 8.4 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z"/></svg>';
   const SHARE = '<svg viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v14"/></svg>';
   const BOOKMARK = '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4V3z"/></svg>';
-
+ 
   function randCount(){
     const n = Math.floor(Math.random() * 900) + 12;
     return n > 999 ? (n/1000).toFixed(1) + 'k' : String(n);
   }
-
+ 
   function addScreen(){
     const div = document.createElement('div');
     div.className = 'screen';
-
+ 
     const dot = document.createElement('div');
     dot.className = 'void-dot';
     dot.style.animationDelay = (Math.random() * 3).toFixed(2) + 's';
     div.appendChild(dot);
-
+ 
     const pageBadge = document.createElement('div');
     pageBadge.className = 'page-badge';
     pageBadge.textContent = '#' + (screenCount + 1);
     div.appendChild(pageBadge);
-
+ 
     const rail = document.createElement('div');
     rail.className = 'icon-rail';
     rail.innerHTML = `
@@ -369,7 +371,7 @@
       <button class="icon-btn">${BOOKMARK}</button>
     `;
     div.appendChild(rail);
-
+ 
     const caption = document.createElement('div');
     caption.className = 'caption-block';
     const capWidth2 = ['52%','44%','60%'][Math.floor(Math.random()*3)];
@@ -381,15 +383,15 @@
       <div class="skel-line skel-caption-2" style="width:${capWidth2}"></div>
     `;
     div.appendChild(caption);
-
+ 
     feed.appendChild(div);
     screenCount++;
-
+ 
     const likeBtn = rail.querySelector('.like-btn');
     likeBtn.addEventListener('click', () => {
       likeBtn.classList.toggle('liked');
     });
-
+ 
     // classic double-tap-to-like, old-Instagram style
     let lastTap = { time: 0, x: 0, y: 0 };
     div.addEventListener('pointerup', (e) => {
@@ -406,7 +408,7 @@
       }
     });
   }
-
+ 
   function triggerBurst(screenEl, clientX, clientY){
     const rect = screenEl.getBoundingClientRect();
     const x = (clientX ?? rect.left + rect.width / 2) - rect.left;
@@ -419,9 +421,9 @@
     screenEl.appendChild(heart);
     heart.addEventListener('animationend', () => heart.remove());
   }
-
+ 
   for (let i = 0; i < 6; i++) addScreen();
-
+ 
   let currentIndex = -1;
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -434,7 +436,7 @@
         } else if (idx === 0) {
           currentIndex = 0;
         }
-
+ 
         if (idx >= screenCount - 3) {
           addScreen();
           observer.observe(feed.lastElementChild);
@@ -442,21 +444,21 @@
       }
     });
   }, { root: feed, threshold: 0.6 });
-
+ 
   Array.from(feed.children).forEach(el => observer.observe(el));
-
+ 
   const hook = document.getElementById('future-hook');
   const backdrop = document.getElementById('modal-backdrop');
   hook.addEventListener('click', () => backdrop.classList.add('show'));
   document.getElementById('modal-close').addEventListener('click', () => backdrop.classList.remove('show'));
   backdrop.addEventListener('click', (e) => { if (e.target === backdrop) backdrop.classList.remove('show'); });
-
+ 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js').catch(() => {});
     });
   }
 </script>
-
+ 
 </body>
 </html>
