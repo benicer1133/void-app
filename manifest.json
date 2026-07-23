@@ -1,6 +1,6 @@
 {
-  "name": "Void",
-  "short_name": "Void",
+  "name": "Doom",
+  "short_name": "Doom",
   "description": "A feed with nothing in it.",
   "start_url": "./index.html",
   "scope": "./",
