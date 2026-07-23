@@ -10,7 +10,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
-<title>Void — a feed with nothing in it</title>
+<title>Doom — a feed with nothing in it</title>
 <style>
   :root{
     --void: #0a0a0b;
@@ -18,12 +18,15 @@
     --line: rgba(255,255,255,0.045);
     --ghost: rgba(255,255,255,0.16);
     --ghost-dim: rgba(255,255,255,0.06);
+    --muted: rgba(255,255,255,0.44);
+    --muted-soft: rgba(255,255,255,0.3);
     --paper: #e8dcc8;
     --amber: #c98a3e;
     --skeleton-base: rgba(255,255,255,0.08);
     --skeleton-shine: rgba(255,255,255,0.18);
     --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
     --serif: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+    --tabbar-h: 64px;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -44,10 +47,41 @@
     color: var(--ghost);
   }
 
-  #feed {
+  /* ---------- pager: horizontal swipe between upload / scroll / analysis ---------- */
+
+  #pager {
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
     height: 100vh;
     height: 100dvh;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  #pager::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+  .page {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ---------- feed / scroll page ---------- */
+
+  #feed {
+    height: 100%;
+    width: 100%;
     overflow-y: scroll;
+    overflow-x: hidden;
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -57,8 +91,7 @@
   #feed::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
   .screen {
-    height: 100vh;
-    height: 100dvh;
+    height: 100%;
     width: 100%;
     scroll-snap-align: start;
     scroll-snap-stop: always;
@@ -85,7 +118,7 @@
   }
 
   #chrome {
-    position: fixed;
+    position: absolute;
     top: 0; left: 0; right: 0;
     display: flex;
     justify-content: space-between;
@@ -102,80 +135,7 @@
 
   #counter {
     font-variant-numeric: tabular-nums;
-    transition: color 0.4s ease;
   }
-
-  #counter.pulse { color: var(--amber); }
-
-  #future-hook {
-    position: fixed;
-    bottom: 22px;
-    left: 20px;
-    font-size: 11px;
-    letter-spacing: 0.04em;
-    color: var(--ghost-dim);
-    z-index: 15;
-    cursor: pointer;
-    pointer-events: auto;
-    border: none;
-    background: none;
-    font-family: var(--mono);
-    padding: 0;
-  }
-
-  #future-hook:hover { color: var(--ghost); }
-
-  #modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 30;
-  }
-
-  #modal-backdrop.show { display: flex; }
-
-  #modal {
-    background: var(--void-soft);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 28px 26px;
-    max-width: 320px;
-    text-align: center;
-  }
-
-  #modal h2 {
-    font-family: var(--serif);
-    font-weight: normal;
-    font-style: italic;
-    font-size: 18px;
-    color: var(--paper);
-    margin: 0 0 10px;
-  }
-
-  #modal p {
-    font-size: 12px;
-    line-height: 1.6;
-    color: var(--ghost);
-    margin: 0 0 18px;
-  }
-
-  #modal button {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    background: var(--amber);
-    color: var(--void);
-    border: none;
-    padding: 10px 18px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  /* ---- per-screen reel chrome ---- */
 
   .burst-heart {
     position: absolute;
@@ -311,28 +271,378 @@
     letter-spacing: 0.04em;
     color: rgba(255,255,255,0.4);
   }
+
+  /* ---------- upload page (placeholder) ---------- */
+
+  #page-upload {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12%;
+  }
+
+  .placeholder-block {
+    text-align: center;
+  }
+
+  .placeholder-block .icon-wrap {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .placeholder-block .icon-wrap svg {
+    width: 22px;
+    height: 22px;
+    stroke: var(--ghost);
+    fill: none;
+    stroke-width: 1.6;
+  }
+
+  .placeholder-block h2 {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: normal;
+    font-size: 19px;
+    color: var(--paper);
+    margin: 0 0 10px;
+  }
+
+  .placeholder-block p {
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--ghost);
+    margin: 0;
+  }
+
+  /* ---------- analysis page ---------- */
+
+  #page-analysis {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 50px 22px calc(var(--tabbar-h) + 16px);
+  }
+
+  .analysis-header {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 20px;
+    color: var(--paper);
+    margin: 0 0 18px;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .stat-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 13px 14px;
+    background: var(--void-soft);
+  }
+
+  .stat-label {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+    color: var(--paper);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat-sub {
+    font-size: 10px;
+    color: var(--muted-soft);
+    margin-top: 4px;
+  }
+
+  .chart-section {
+    margin-bottom: 18px;
+  }
+
+  .chart-title {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 100px;
+    gap: 8px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0;
+  }
+
+  .chart-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .chart-bar {
+    width: 60%;
+    background: linear-gradient(180deg, var(--amber), rgba(201,138,62,0.35));
+    border-radius: 4px 4px 0 0;
+    min-height: 2px;
+    transition: height 0.5s ease;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .bar-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translate(-50%, -6px) scale(0.85);
+    background: var(--paper);
+    color: var(--void);
+    font-family: var(--mono);
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+    padding: 3px 7px;
+    border-radius: 5px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+
+  .bar-tooltip.show {
+    opacity: 1;
+    transform: translate(-50%, -6px) scale(1);
+  }
+
+  .chart-col.today .chart-bar {
+    background: linear-gradient(180deg, var(--paper), rgba(232,220,200,0.4));
+  }
+
+  .chart-label {
+    font-size: 9px;
+    color: var(--muted-soft);
+    letter-spacing: 0.04em;
+  }
+
+  .chart-bar.opens-bar {
+    background: linear-gradient(180deg, #7fa8c9, rgba(127,168,201,0.3));
+  }
+
+  .chart-col.today .chart-bar.opens-bar {
+    background: linear-gradient(180deg, var(--paper), rgba(232,220,200,0.4));
+  }
+
+  .streak-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 13px 18px;
+    background: var(--void-soft);
+    margin-bottom: 18px;
+  }
+
+  .streak-card .stat-label { margin-bottom: 4px; }
+
+  .streak-flame {
+    font-size: 26px;
+    color: var(--amber);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- bottom tab bar ---------- */
+
+  #tabbar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    display: flex;
+    background: rgba(10,10,11,0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line);
+    z-index: 50;
+  }
+
+  .tab-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: var(--ghost-dim);
+    cursor: pointer;
+    font-family: var(--mono);
+  }
+
+  .tab-btn svg {
+    width: 21px;
+    height: 21px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.6;
+  }
+
+  .tab-btn span {
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .tab-btn.active {
+    color: var(--paper);
+  }
+
+  .tab-btn.active svg {
+    stroke: var(--amber);
+  }
 </style>
 </head>
 <body>
 
-<div id="chrome">
-  <span>void</span>
-  <span id="counter">0 screens</span>
+<div id="pager">
+
+  <section class="page" id="page-upload">
+    <div class="placeholder-block">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>
+      </div>
+      <h2>Coming soon</h2>
+      <p>This is where you'll load in your own study<br>materials, notes, or flashcards instead<br>of the empty feed.</p>
+    </div>
+  </section>
+
+  <section class="page" id="page-scroll">
+    <div id="chrome">
+      <span>doom</span>
+      <span id="counter">0 screens</span>
+    </div>
+    <div id="feed"></div>
+  </section>
+
+  <section class="page" id="page-analysis">
+    <div class="analysis-header">Your stats</div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">Today</div>
+        <div class="stat-value" id="stat-today-time">0m</div>
+        <div class="stat-sub">time in the feed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Weekly avg</div>
+        <div class="stat-value" id="stat-week-time">0m</div>
+        <div class="stat-sub">per day, last 7 days</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Opens today</div>
+        <div class="stat-value" id="stat-today-opens">0</div>
+        <div class="stat-sub">times you came back</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Opens / day</div>
+        <div class="stat-value" id="stat-week-opens">0</div>
+        <div class="stat-sub">average, last 7 days</div>
+      </div>
+    </div>
+
+    <div class="streak-card">
+      <div>
+        <div class="stat-label">Current streak</div>
+        <div class="stat-sub">consecutive days opened</div>
+      </div>
+      <div class="streak-flame" id="stat-streak">0 days</div>
+    </div>
+
+    <div class="chart-section">
+      <div class="chart-title">Minutes scrolled — last 7 days</div>
+      <div class="chart-bars" id="chart-bars"></div>
+    </div>
+
+    <div class="chart-section">
+      <div class="chart-title">App opens — last 7 days</div>
+      <div class="chart-bars" id="chart-bars-opens"></div>
+    </div>
+  </section>
+
 </div>
 
-<div id="feed"></div>
-
-<button id="future-hook">+ add your own content (coming soon)</button>
-
-<div id="modal-backdrop">
-  <div id="modal">
-    <h2>Not yet — but soon</h2>
-    <p>This is where you'll be able to load your own study notes, flashcards, or reading instead of nothing. For now, the feed stays empty on purpose.</p>
-    <button id="modal-close">Got it</button>
-  </div>
-</div>
+<nav id="tabbar">
+  <button class="tab-btn" data-index="0">
+    <svg viewBox="0 0 24 24"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>
+    <span>Upload</span>
+  </button>
+  <button class="tab-btn active" data-index="1">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>
+    <span>Scroll</span>
+  </button>
+  <button class="tab-btn" data-index="2">
+    <svg viewBox="0 0 24 24"><path d="M4 20V10M11 20V4M18 20v-7"/></svg>
+    <span>Analysis</span>
+  </button>
+</nav>
 
 <script>
+  /* ============ pager navigation ============ */
+  const pager = document.getElementById('pager');
+  const tabs = document.querySelectorAll('.tab-btn');
+
+  // pager defaults to its leftmost page (Upload) on load — force it to
+  // open on the Scroll page instead, to match the highlighted tab.
+  // Deferred with requestAnimationFrame because setting scrollLeft too early
+  // (before layout has run) silently does nothing.
+  requestAnimationFrame(() => {
+    pager.scrollLeft = window.innerWidth;
+  });
+
+  function goToPage(index){
+    pager.scrollTo({ left: index * window.innerWidth, behavior: 'smooth' });
+  }
+
+  tabs.forEach((btn) => {
+    btn.addEventListener('click', () => goToPage(parseInt(btn.dataset.index, 10)));
+  });
+
+  let pagerScrollTimeout = null;
+  pager.addEventListener('scroll', () => {
+    const idx = Math.round(pager.scrollLeft / window.innerWidth);
+    tabs.forEach((btn, i) => btn.classList.toggle('active', i === idx));
+    currentPageIndex = idx;
+    clearTimeout(pagerScrollTimeout);
+    pagerScrollTimeout = setTimeout(() => {
+      if (idx === 2) renderAnalysis();
+    }, 150);
+  });
+
+  let currentPageIndex = 1;
+
+  /* ============ feed (scroll page) ============ */
   const feed = document.getElementById('feed');
   const counterEl = document.getElementById('counter');
 
@@ -395,10 +705,9 @@
       likeBtn.classList.toggle('liked');
     });
 
-    // classic double-tap-to-like, old-Instagram style
     let lastTap = { time: 0, x: 0, y: 0 };
     div.addEventListener('pointerup', (e) => {
-      if (e.target.closest('.icon-rail') || e.target.closest('#future-hook')) return;
+      if (e.target.closest('.icon-rail')) return;
       const now = Date.now();
       const dx = Math.abs(e.clientX - lastTap.x);
       const dy = Math.abs(e.clientY - lastTap.y);
@@ -450,15 +759,150 @@
 
   Array.from(feed.children).forEach(el => observer.observe(el));
 
-  const hook = document.getElementById('future-hook');
-  const backdrop = document.getElementById('modal-backdrop');
-  hook.addEventListener('click', () => backdrop.classList.add('show'));
-  document.getElementById('modal-close').addEventListener('click', () => backdrop.classList.remove('show'));
-  backdrop.addEventListener('click', (e) => { if (e.target === backdrop) backdrop.classList.remove('show'); });
+  /* ============ analytics tracking ============ */
+  const STORAGE_KEY = 'doom-analytics-v1';
 
+  function todayKey(d = new Date()){
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function loadAnalytics(){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : { days: {} };
+    } catch (e) {
+      return { days: {} };
+    }
+  }
+
+  function saveAnalytics(data){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
+  }
+
+  let analytics = loadAnalytics();
+  const today = todayKey();
+  if (!analytics.days[today]) analytics.days[today] = { seconds: 0, opens: 0 };
+  analytics.days[today].opens += 1;
+  saveAnalytics(analytics);
+
+  // tick every second; only counts while the scroll page is active and tab is visible
+  setInterval(() => {
+    if (document.visibilityState !== 'visible') return;
+    if (currentPageIndex !== 1) return;
+    const key = todayKey();
+    if (!analytics.days[key]) analytics.days[key] = { seconds: 0, opens: 0 };
+    analytics.days[key].seconds += 1;
+  }, 1000);
+
+  // persist periodically so we don't hammer localStorage every second
+  setInterval(() => saveAnalytics(analytics), 5000);
+  window.addEventListener('pagehide', () => saveAnalytics(analytics));
+  window.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveAnalytics(analytics); });
+
+  function last7Keys(){
+    const keys = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      keys.push(todayKey(d));
+    }
+    return keys;
+  }
+
+  function formatMinutes(seconds){
+    const mins = Math.round(seconds / 60);
+    if (mins < 60) return mins + 'm';
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return h + 'h ' + m + 'm';
+  }
+
+  function calcStreak(){
+    let streak = 0;
+    let d = new Date();
+    while (true) {
+      const key = todayKey(d);
+      const opens = analytics.days[key]?.opens || 0;
+      if (opens > 0) {
+        streak++;
+        d.setDate(d.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  function renderAnalysis(){
+    const keys = last7Keys();
+    const todayData = analytics.days[today] || { seconds: 0, opens: 0 };
+
+    const weekSeconds = keys.reduce((sum, k) => sum + (analytics.days[k]?.seconds || 0), 0);
+    const weekOpens = keys.reduce((sum, k) => sum + (analytics.days[k]?.opens || 0), 0);
+    const avgSeconds = weekSeconds / 7;
+    const avgOpens = weekOpens / 7;
+
+    document.getElementById('stat-today-time').textContent = formatMinutes(todayData.seconds);
+    document.getElementById('stat-week-time').textContent = formatMinutes(avgSeconds);
+    document.getElementById('stat-today-opens').textContent = todayData.opens;
+    document.getElementById('stat-week-opens').textContent = avgOpens.toFixed(1);
+
+    const streak = calcStreak();
+    document.getElementById('stat-streak').textContent = streak + (streak === 1 ? ' day' : ' days');
+
+    const dayLabels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const maxSeconds = Math.max(...keys.map(k => analytics.days[k]?.seconds || 0), 60);
+    const maxOpens = Math.max(...keys.map(k => analytics.days[k]?.opens || 0), 1);
+
+    const chartEl = document.getElementById('chart-bars');
+    chartEl.innerHTML = '';
+    const opensChartEl = document.getElementById('chart-bars-opens');
+    opensChartEl.innerHTML = '';
+
+    keys.forEach((k) => {
+      const seconds = analytics.days[k]?.seconds || 0;
+      const opens = analytics.days[k]?.opens || 0;
+      const heightPct = Math.max((seconds / maxSeconds) * 100, seconds > 0 ? 4 : 0);
+      const opensHeightPct = Math.max((opens / maxOpens) * 100, opens > 0 ? 4 : 0);
+      const d = new Date(k + 'T00:00:00');
+      const label = dayLabels[d.getDay()];
+      const minutesLabel = Math.round(seconds / 60) + 'm';
+      const opensLabel = opens + (opens === 1 ? ' open' : ' opens');
+
+      const col = document.createElement('div');
+      col.className = 'chart-col' + (k === today ? ' today' : '');
+      col.innerHTML = `<div class="chart-bar"><span class="bar-tooltip">${minutesLabel}</span></div><div class="chart-label">${label}</div>`;
+      col.querySelector('.chart-bar').style.height = heightPct + '%';
+      chartEl.appendChild(col);
+
+      const opensCol = document.createElement('div');
+      opensCol.className = 'chart-col' + (k === today ? ' today' : '');
+      opensCol.innerHTML = `<div class="chart-bar opens-bar"><span class="bar-tooltip">${opensLabel}</span></div><div class="chart-label">${label}</div>`;
+      opensCol.querySelector('.chart-bar').style.height = opensHeightPct + '%';
+      opensChartEl.appendChild(opensCol);
+    });
+
+    document.querySelectorAll('.chart-bar').forEach((bar) => {
+      bar.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const tip = bar.querySelector('.bar-tooltip');
+        const wasShown = tip.classList.contains('show');
+        document.querySelectorAll('.bar-tooltip.show').forEach(t => t.classList.remove('show'));
+        if (!wasShown) tip.classList.add('show');
+      });
+    });
+  }
+
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.bar-tooltip.show').forEach(t => t.classList.remove('show'));
+  });
+
+  renderAnalysis();
+
+  /* ============ service worker ============ */
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
     });
   }
 </script>
